@@ -28,6 +28,9 @@ secrets/
 # Infra
 /infra
 
+# Media
+/images
+
 # Python
 __pycache__/
 *.py[cod]
