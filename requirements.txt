@@ -2,3 +2,5 @@ anthropic
 pillow
 pillow-heif
 python-dotenv
+python-telegram-bot[webhooks]
+azure-storage-blob

@@ -25,6 +25,9 @@ Temporary Items
 *.key
 secrets/
 
+# Infra
+/infra
+
 # Python
 __pycache__/
 *.py[cod]
