@@ -1,7 +1,7 @@
 import os
 import tempfile
 from telegram import Update
-from telegram.ext import Application, MessageHandler, filters, ContextTypes
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from dotenv import load_dotenv
 from main import identify_car
 
@@ -10,6 +10,20 @@ load_dotenv()
 BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
 WEBHOOK_URL = os.environ["WEBHOOK_URL"]  # e.g. https://your-app.azurecontainerapps.io
 PORT = int(os.environ.get("PORT", 8443))
+
+
+_START_MESSAGE = (
+    "👋 Welcome to Car Price Estimator!\n\n"
+    "📸 Send me a car photo — I'll identify its make and model.\n\n"
+    "⚠️ Limitations:\n"
+    "- Make & model only (no trim or year)\n"
+    "- Photos only — videos are ignored\n"
+    "- Price estimation coming soon"
+)
+
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text(_START_MESSAGE)
 
 
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -30,6 +44,7 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 def main() -> None:
     app = Application.builder().token(BOT_TOKEN).build()
+    app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
     app.run_webhook(
         listen="0.0.0.0",
