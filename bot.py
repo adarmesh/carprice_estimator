@@ -1,3 +1,4 @@
+import asyncio
 import os
 import tempfile
 from telegram import Update
@@ -30,9 +31,18 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     photo = update.message.photo[-1]  # largest available size
     file = await context.bot.get_file(photo.file_id)
 
+    async def keep_typing():
+        while True:
+            await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
+            await asyncio.sleep(4)
+
     with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
         await file.download_to_drive(tmp.name)
-        result = identify_car(tmp.name)
+        typing_task = asyncio.create_task(keep_typing())
+        try:
+            result = await asyncio.get_event_loop().run_in_executor(None, identify_car, tmp.name)
+        finally:
+            typing_task.cancel()
 
     if result.get("error"):
         await update.message.reply_text(f"Could not identify car: {result['error']}")
