@@ -5,6 +5,7 @@ from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from dotenv import load_dotenv
 from main import identify_car
+from parser import build_kolesa_url, parser_kolesa_kz
 
 load_dotenv()
 
@@ -15,11 +16,10 @@ PORT = int(os.environ.get("PORT", 8443))
 
 _START_MESSAGE = (
     "👋 Welcome to Car Price Estimator!\n\n"
-    "📸 Send me a car photo — I'll identify its make and model.\n\n"
+    "📸 Send me a car photo — I'll identify its make, model, and year, then look up the average price on kolesa.kz.\n\n"
     "⚠️ Limitations:\n"
-    "- Make & model only (no trim or year)\n"
     "- Photos only — videos are ignored\n"
-    "- Price estimation coming soon"
+    "- Price data sourced from kolesa.kz"
 )
 
 
@@ -46,10 +46,27 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
     if result.get("error"):
         await update.message.reply_text(f"Could not identify car: {result['error']}")
-    else:
-        make = result.get("make") or "unknown"
-        model = result.get("model") or "unknown"
-        await update.message.reply_text(f"Make: {make}\nModel: {model}")
+        return
+
+    make = result["make"]
+    model = result["model"]
+    build_year = result["build_year"]
+
+    url = build_kolesa_url(make, model, build_year)
+
+    try:
+        price = await asyncio.get_event_loop().run_in_executor(None, parser_kolesa_kz, url)
+    except Exception:
+        price = None
+
+    lines = [
+        f"Make: {make}",
+        f"Model: {model}",
+        f"Year: {build_year}",
+        f"Avg price: {price:,} ₸".replace(",", " ") if price else "Avg price: not found",
+        f"Search: {url}",
+    ]
+    await update.message.reply_text("\n".join(lines))
 
 
 def main() -> None:

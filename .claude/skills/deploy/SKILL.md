@@ -1,6 +1,7 @@
 ---
 name: deploy
 description: Deploy the application by sourcing .env and running ./infra/deploy.sh. Use when the user asks to deploy, ship, or release the application.
+disable-model-invocation: true
 user-invocable: true
 ---
 

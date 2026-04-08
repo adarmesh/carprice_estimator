@@ -14,15 +14,16 @@ load_dotenv()
 
 _IDENTIFY_CAR_TOOL = {
     "name": "identify_car",
-    "description": "Report the identified car make and model, or an error if no car is present.",
+    "description": "Report the identified car make, model, and build year, or an error if no car is present.",
     "input_schema": {
         "type": "object",
         "properties": {
             "make": {"type": ["string", "null"], "description": "Car manufacturer, e.g. Toyota"},
             "model": {"type": ["string", "null"], "description": "Car model name, e.g. Camry"},
-            "error": {"type": ["string", "null"], "description": "Set if no car is detected"},
+            "build_year": {"type": ["string", "null"], "description": "Model year as a 4-digit string, e.g. 2007"},
+            "error": {"type": ["string", "null"], "description": "Set if no car is detected or characteristics cannot be determined"},
         },
-        "required": ["make", "model", "error"],
+        "required": ["make", "model", "build_year", "error"],
     },
 }
 
@@ -72,8 +73,9 @@ def identify_car(image_path: str) -> dict:
         system=(
             "You are a car identification expert. "
             "When given an image, determine if it contains a car. "
-            "If it does not contain a car, set error to 'No car detected in image' and make/model to null. "
-            "If it contains a car but you cannot determine the make or model, set those fields to null."
+            "If it does not contain a car, set error to 'No car detected in image' and make/model/build_year to null. "
+            "If it contains a car but you cannot determine make, model, or build year, set error to describe which fields "
+            "could not be determined and set those specific fields to null."
         ),
         tools=[_IDENTIFY_CAR_TOOL],
         tool_choice={"type": "tool", "name": "identify_car"},
@@ -89,7 +91,7 @@ def identify_car(image_path: str) -> dict:
                             "data": image_data,
                         },
                     },
-                    {"type": "text", "text": "Identify the car's make and model."},
+                    {"type": "text", "text": "Identify the car's make, model, and build year."},
                 ],
             }
         ],
@@ -98,7 +100,11 @@ def identify_car(image_path: str) -> dict:
     tool_input = next(b.input for b in response.content if b.type == "tool_use")
     if tool_input.get("error"):
         return {"error": tool_input["error"]}
-    return {"make": tool_input["make"], "model": tool_input["model"]}
+    return {
+        "make": tool_input["make"],
+        "model": tool_input["model"],
+        "build_year": tool_input["build_year"],
+    }
 
 
 def main():

@@ -63,7 +63,9 @@ The application will be exposed to end users via a Telegram bot.
 
 1. User sends a car photo to the bot
 2. Bot passes the image to the car identification service (Step 1)
-3. Bot replies with the identified make/model (or an error message)
+3. Bot receives identified make/model/build_year (or an error message)
+4. Bot builds GET request for another service to get average price.
+5. Bot replies with average price and built GET request in nicely human-readable format.
 
 ### Hosting requirement
 
