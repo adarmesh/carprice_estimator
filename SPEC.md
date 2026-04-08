@@ -17,7 +17,7 @@ Install all necessary dep-cies to build an app (requirements.txt, package.json, 
 ### Processing
 
 - Send the image to the Anthropic API (Claude vision)
-- Ask the model to identify the car's make and model
+- Ask the model to identify as many car characteristics as possible: make, model, build year.
 
 ### Output
 
@@ -26,18 +26,34 @@ A JSON object:
 ```json
 {
   "make": "Toyota",
-  "model": "Camry"
+  "model": "RAV4",
+  "build_year": "2007"
 }
 ```
 
 ### Error cases
 
 - Image does not contain a car → return an error response
-- Car is visible but make/model cannot be determined → return `null` for the unknown fields
+- Car is visible but if any of make/model/build_year cannot be determined → return an error response with field that couldn't be determined.
 
-## Step 2: Price Lookup (out of scope)
+## Step 2: Price Lookup
 
-The `make` and `model` fields from Step 1 will be passed to external pricing APIs. Not part of this implementation.
+The `make`, `model`, `build_year` fields from Step 1 are used to build a request to an external pricing API.
+
+### Building the API URL
+
+- Base URL: `https://kolesa.kz/cars`
+- URI parameters: `make`, `model`, `build_year`
+- Example: `https://kolesa.kz/cars/toyota/rav4/?year[from]=2007&year[to]=2007`
+
+### Output
+
+A HTML output will list ads with car images and prices. We're only interested in finding average price under
+
+### Error cases
+
+- Pricing API is unavailable → return an error response
+- No pricing data found for the given make/model/year → return `null` for price fields
 
 ## Distribution Channel: Telegram Bot
 
@@ -52,31 +68,3 @@ The application will be exposed to end users via a Telegram bot.
 ### Hosting requirement
 
 The bot must run as a persistent process on a server (not a local script) to receive messages from Telegram in real time.
-
-## Step 3: Image Collection (in scope)
-
-Every car photo received via the Telegram bot is stored for future use (dataset accumulation, model validation, fine-tuning).
-
-### Storage backend
-
-**Azure Blob Storage** — one container for raw images.
-
-### What to store
-
-| Data | Where |
-|---|---|
-| Raw image file | Azure Blob Storage |
-| Metadata (make, model, error, timestamp, telegram user hash, blob path) | Azure SQL / SQLite (TBD) |
-
-### Flow
-
-1. User sends photo to Telegram bot
-2. Bot downloads the image from Telegram
-3. Image is uploaded to Azure Blob Storage (key: `{date}/{uuid}.jpg`)
-4. Identification result + blob reference saved to metadata store
-5. Bot replies to user
-
-### Notes
-
-- Store Telegram `file_id` alongside the blob key as a cheap reference
-- Hash user identifiers — do not store raw Telegram user IDs
