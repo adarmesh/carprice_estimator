@@ -1,0 +1,17 @@
+{
+  "type": "object",
+  "properties": {
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file":     { "type": "string" },
+          "line":     { "type": "integer" },
+          "severity": { "type": "string" },
+          "message":  { "type": "string" }
+        }
+      }
+    }
+  }
+}

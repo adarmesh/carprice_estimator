@@ -37,12 +37,14 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             await asyncio.sleep(4)
 
     with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
-        await file.download_to_drive(tmp.name)
-        typing_task = asyncio.create_task(keep_typing())
-        try:
-            result = await asyncio.get_event_loop().run_in_executor(None, identify_car, tmp.name)
-        finally:
-            typing_task.cancel()
+        tmp_path = tmp.name
+    await file.download_to_drive(tmp_path)
+    typing_task = asyncio.create_task(keep_typing())
+    try:
+        result = await asyncio.get_event_loop().run_in_executor(None, identify_car, tmp_path)
+    finally:
+        typing_task.cancel()
+        os.unlink(tmp_path)
 
     if result.get("error"):
         await update.message.reply_text(f"Could not identify car: {result['error']}")
