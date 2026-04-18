@@ -8,12 +8,13 @@ jobs:
   review-commit:
     runs-on: ubuntu-latest
     steps:
-      - name: Install Claude Code
-        run: npm install -g @anthropic-ai/claude-code
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
       - name: Analyse commit
         run: |
-          claude -p "Analyse the changes in this pushed commit for security issues, error handling gaps, and test coverage."
+          claude --output-format json --json-schema .github/review-schema.json \
+            -p "Analyse the changes in this pushed commit for security issues, error handling gaps, and test coverage."
     env:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
