@@ -5,10 +5,14 @@ on:
     branches: [ main ]
 
 jobs:
-  hello:
+  review-commit:
     runs-on: ubuntu-latest
     steps:
-      - name: Say hello
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Analyse commit
         run: |
           claude -p "Analyse the changes in this pushed commit for security issues, error handling gaps, and test coverage."
     env:
