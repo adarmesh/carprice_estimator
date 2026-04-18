@@ -22,6 +22,11 @@ jobs:
         run: |
           claude -p "Analyse the changes in this pushed commit for security issues, error handling gaps, and test coverage." \
             --output-format json > review.json
+      - name: Upload review artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: review
+          path: review.json
       - name: Post review as PR comment
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
