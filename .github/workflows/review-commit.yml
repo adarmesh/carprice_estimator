@@ -18,7 +18,7 @@ jobs:
           PYTHONUNBUFFERED: "1"
           NODE_NO_WARNINGS: "1"
         run: |
-          claude --dangerously-skip-permissions --output-format json --json-schema .github/review-schema.json \
-            -p "Analyse the changes in this pushed commit for security issues, error handling gaps, and test coverage."
+          claude -p "Analyse the changes in this pushed commit for security issues, error handling gaps, and test coverage." \
+            --output-format json
     env:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
