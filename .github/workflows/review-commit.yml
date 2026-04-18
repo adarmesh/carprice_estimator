@@ -20,7 +20,8 @@ jobs:
       - name: Analyse commit
         timeout-minutes: 5
         run: |
-          claude -p "Analyse the changes in this pushed commit for security issues, error handling gaps, and test coverage." \
+          claude -p "Analyse the changes in this pushed commit for security issues, error handling gaps, and test coverage. Write the findings to review.json as JSON matching: {\"findings\": [{\"file\": \"...\", \"line\": 0, \"severity\": \"...\", \"message\": \"...\"}]}" \
+            --allowedTools Write \
             --output-format json > review.json
       - name: Upload review artifact
         uses: actions/upload-artifact@v4
