@@ -13,8 +13,11 @@ jobs:
       - name: Install Claude Code
         run: npm install -g @anthropic-ai/claude-code
       - name: Analyse commit
+        env:
+          PYTHONUNBUFFERED: "1"
+          NODE_NO_WARNINGS: "1"
         run: |
-          claude --dangerously-skip-permissions --verbose --output-format json --json-schema .github/review-schema.json \
+          stdbuf -oL -eL claude --dangerously-skip-permissions --verbose --output-format json --json-schema .github/review-schema.json \
             -p "Analyse the changes in this pushed commit for security issues, error handling gaps, and test coverage."
     env:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
