@@ -67,35 +67,44 @@ def identify_car(image_path: str) -> dict:
 
     client = anthropic.Anthropic()
 
-    response = client.messages.create(
-        model="claude-opus-4-6",
-        max_tokens=1024,
-        system=(
-            "You are a car identification expert. "
-            "When given an image, determine if it contains a car. "
-            "If it does not contain a car, set error to 'No car detected in image' and make/model/build_year to null. "
-            "If it contains a car but you cannot determine make, model, or build year, set error to describe which fields "
-            "could not be determined and set those specific fields to null."
-        ),
-        tools=[_IDENTIFY_CAR_TOOL],
-        tool_choice={"type": "tool", "name": "identify_car"},
-        messages=[
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "image",
-                        "source": {
-                            "type": "base64",
-                            "media_type": media_type,
-                            "data": image_data,
+    try:
+        response = client.messages.create(
+            model="claude-opus-4-6",
+            max_tokens=1024,
+            system=(
+                "You are a car identification expert. "
+                "When given an image, determine if it contains a car. "
+                "If it does not contain a car, set error to 'No car detected in image' and make/model/build_year to null. "
+                "If it contains a car but you cannot determine make, model, or build year, set error to describe which fields "
+                "could not be determined and set those specific fields to null."
+            ),
+            tools=[_IDENTIFY_CAR_TOOL],
+            tool_choice={"type": "tool", "name": "identify_car"},
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image",
+                            "source": {
+                                "type": "base64",
+                                "media_type": media_type,
+                                "data": image_data,
+                            },
                         },
-                    },
-                    {"type": "text", "text": "Identify the car's make, model, and build year."},
-                ],
-            }
-        ],
-    )
+                        {"type": "text", "text": "Identify the car's make, model, and build year."},
+                    ],
+                }
+            ],
+        )
+    except anthropic.RateLimitError:
+        return {"error": "Rate limit reached. Please try again later."}
+    except anthropic.AuthenticationError:
+        return {"error": "Invalid API key."}
+    except anthropic.APIConnectionError:
+        return {"error": "Could not connect to the API. Please check your network."}
+    except anthropic.APIError as e:
+        return {"error": f"API error: {e}"}
 
     tool_input = next(b.input for b in response.content if b.type == "tool_use")
     if tool_input.get("error"):

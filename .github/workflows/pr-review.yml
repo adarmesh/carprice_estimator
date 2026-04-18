@@ -20,7 +20,7 @@ jobs:
       - name: Analyse commit
         timeout-minutes: 5
         run: |
-          claude -p "Analyse the changes in this pushed commit for security issues, error handling gaps, and test coverage. Write the findings to review.json following the schema defined in CLAUDE.md." \
+          claude -p "Analyse only the lines in diff.patch for security issues, error handling gaps, and test coverage. Write findings to review.json following the schema in CLAUDE.md." \
             --allowedTools Write \
             --output-format json > /dev/null
       - name: Upload review artifact
