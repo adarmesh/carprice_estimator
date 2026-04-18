@@ -1,4 +1,4 @@
-name: Hello World
+name: PR review (diff only)
 
 on:
   pull_request:
