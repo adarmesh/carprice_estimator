@@ -20,17 +20,18 @@ jobs:
       - name: Analyse commit
         timeout-minutes: 5
         run: |
-          claude -p "Analyse the changes in this pushed commit for security issues, error handling gaps, and test coverage. Write the findings to review.json as JSON matching: {\"findings\": [{\"file\": \"...\", \"line\": 0, \"severity\": \"...\", \"message\": \"...\"}]}" \
+          claude -p "Analyse the changes in this pushed commit for security issues, error handling gaps, and test coverage. Write the findings to review.json following the schema defined in CLAUDE.md." \
             --allowedTools Write \
-            --output-format json > review.json
+            --output-format json > /dev/null
       - name: Upload review artifact
         uses: actions/upload-artifact@v4
         with:
           name: review
           path: review.json
+      - name: Setup reviewdog
+        uses: reviewdog/action-setup@v1
       - name: Post review as PR comment
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr comment ${{ github.event.pull_request.number }} \
-            --body "$(cat review.json)"
+          cat review.json | reviewdog -f rdjson -reporter=github-pr-review
