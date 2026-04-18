@@ -2,7 +2,7 @@
 
 ## Code review schema
 
-```bash
+```json
 {
   "type": "object",
   "properties": {

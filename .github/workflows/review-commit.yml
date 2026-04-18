@@ -4,9 +4,14 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  pull-requests: write
+
 jobs:
   review-commit:
     runs-on: ubuntu-latest
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -14,11 +19,12 @@ jobs:
         run: npm install -g @anthropic-ai/claude-code
       - name: Analyse commit
         timeout-minutes: 5
-        env:
-          PYTHONUNBUFFERED: "1"
-          NODE_NO_WARNINGS: "1"
         run: |
           claude -p "Analyse the changes in this pushed commit for security issues, error handling gaps, and test coverage." \
-            --output-format json
-    env:
-      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+            --output-format json > review.json
+      - name: Post review as PR comment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} \
+            --body "$(cat review.json)"
