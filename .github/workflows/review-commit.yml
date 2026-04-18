@@ -14,7 +14,7 @@ jobs:
         run: npm install -g @anthropic-ai/claude-code
       - name: Analyse commit
         run: |
-          claude --dangerously-skip-permissions --output-format json --json-schema .github/review-schema.json \
+          claude --dangerously-skip-permissions --verbose --output-format json --json-schema .github/review-schema.json \
             -p "Analyse the changes in this pushed commit for security issues, error handling gaps, and test coverage."
     env:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
