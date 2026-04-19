@@ -6,6 +6,7 @@ on:
 
 permissions:
   pull-requests: write
+  checks: write
 
 jobs:
   review-commit:
@@ -35,8 +36,8 @@ jobs:
             diff.patch
       - name: Setup reviewdog
         uses: reviewdog/action-setup@v1
-      - name: Post review as PR comment
+      - name: Post review as check
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          cat review.json | reviewdog -f rdjson -reporter=github-pr-review
+          cat review.json | reviewdog -f rdjson -reporter=github-check
