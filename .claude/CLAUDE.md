@@ -1,40 +1,11 @@
 # CLAUDE.md
 
-## Testing Standards (CI Context)
+@import standards/testing-requirements.md
 
-- Use factory functions from test/factories/ for data creation
-- Integration tests use the test database via test/setup/db.ts
-- Do not test private implementation details
-- Coverage target: 80% branch coverage for new code
-- Available fixtures: test/fixtures/users.json, test/fixtures/orders.json
+@import standards/review-criteria.md
 
-## Review Criteria
+@import standards/code-review-schema.md
 
-- Critical: security issues, data loss risk, authentication bypass
-- Major: missing error handling, uncovered edge cases
-- Minor: naming conventions, style inconsistencies
+@import standards/error-handling.md
 
-## Code review schema
-
-Output findings as rdjson (Reviewdog Diagnostic JSON):
-
-```json
-{
-  "diagnostics": [
-    {
-      "message": "string",
-      "location": {
-        "path": "string",
-        "range": {
-          "start": {
-            "line": 1
-          }
-        }
-      },
-      "severity": "ERROR | WARNING | INFO"
-    }
-  ]
-}
-```
-
-Severity mapping: high → `ERROR`, medium → `WARNING`, low → `INFO`.
+@import standards/naming-conventions.md
