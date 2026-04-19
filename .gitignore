@@ -97,6 +97,10 @@ dist/
 target/
 out/
 
+# CI artifacts
+review.json
+diff.patch
+
 # Logs
 *.log
 logs/
