@@ -31,7 +31,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: review
-          path: review.json
+          path: |
+            review.json
+            diff.patch
       - name: Setup reviewdog
         uses: reviewdog/action-setup@v1
       - name: Post review as PR comment
