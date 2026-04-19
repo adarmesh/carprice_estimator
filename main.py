@@ -106,7 +106,9 @@ def identify_car(image_path: str) -> dict:
     except anthropic.APIError as e:
         return {"error": f"API error: {e}"}
 
-    tool_input = next(b.input for b in response.content if b.type == "tool_use")
+    tool_input = next((b.input for b in response.content if b.type == "tool_use"), None)
+    if tool_input is None:
+        return {"error": "Unexpected response format."}
     if tool_input.get("error"):
         return {"error": tool_input["error"]}
     return {
