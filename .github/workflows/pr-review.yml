@@ -24,7 +24,7 @@ jobs:
       - name: Analyse commit
         timeout-minutes: 5
         run: |
-          claude -p "Analyse only the lines in diff.patch for security issues, error handling gaps, and test coverage. Output ONLY the raw rdjson object following the schema in CLAUDE.md. No explanation, no summary, no markdown — just the JSON." \
+          claude -p "Analyse only the lines in diff.patch for security issues, error handling gaps, and test coverage. Output ONLY the raw rdjson object following the schema in CLAUDE.md. No explanation, no summary, no markdown — just the JSON. Do NOT wrap the JSON in markdown. Wrong: \`\`\`json {...} \`\`\`. Correct: {...}" \
             --output-format json | jq -r '.result' > review.json
       - name: Upload review artifact
         uses: actions/upload-artifact@v4
