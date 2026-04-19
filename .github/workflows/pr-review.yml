@@ -15,10 +15,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Install Claude Code
         run: npm install -g @anthropic-ai/claude-code
       - name: Generate diff
-        run: git diff origin/${{ github.base_ref }}...HEAD > diff.patch
+        run: git diff origin/${{ github.base_ref }}..HEAD > diff.patch
       - name: Analyse commit
         timeout-minutes: 5
         run: |
